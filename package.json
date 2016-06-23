@@ -1,0 +1,26 @@
+{
+	"name": "node-red-contrib-http-auth0",
+	"version": "0.1.6",
+	"description": "Yet another [http in] with auth0 authentication provider to verify every incoming requests containing oauth2_token.",
+	"dependencies": {
+		"is-utf8": ">=0.2.1",
+		"request" : ">=2.72.0",
+		"redis" : ">=2.6.2",
+		"q": ">=1.4.1"
+	},
+	"license": "MIT",
+	"keywords": ["node-red", "auth0", "http"],
+	"node-red": {
+		"nodes": {
+			"http-auth0": "http-auth0.js"
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cuongquay/node-red-contrib-http-auth0"
+	},
+	"author": {
+		"name": "DUONG Dinh Cuong",
+		"email": "cuong3ihut@gmail.com"
+	}
+}
