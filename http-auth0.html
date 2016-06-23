@@ -13,6 +13,83 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+
+<script type="text/x-red" data-template-name="cache-server">
+	<div class="form-row">
+		<ul style="background: #fff; min-width: 600px; margin-bottom: 20px;" id="node-config-cache-server-tabs"></ul>
+	</div>
+	<div id="node-config-cache-server-tabs-content" style="min-height: 170px;">
+		<div id="cache-server-tab-connection" style="display:none">
+			<div class="form-row node-input-name">
+				<label for="node-config-input-name"><i class="fa fa-globe"></i> <span>Server Name</span></label>
+					<input class="input-append-left" type="text" id="node-config-input-name" placeholder="Enter a server name" style="width: 40%;" >
+			</div>
+			<div class="form-row node-input-address">
+				<label for="node-config-input-address"><i class="fa fa-link"></i> <span>Redis Server</span></label>
+					<input class="input-append-left" type="text" id="node-config-input-address" placeholder="localhost" style="width: 40%;" >
+			</div>
+			<div class="form-row node-input-port">
+				<label for="node-config-input-port"><i class="fa fa-edit"></i> <span>Redis Port</span></label>
+				<input type="number" id="node-config-input-port" placeholder="6379" style="width: 40%;">
+			</div>
+		</div>
+		<div id="cache-server-tab-about" style="display:none">
+			<div class="form-row node-label-author">
+				<label><i class="fa fa-user"></i> <span>Author</span></label>
+				<span class="input-append-left"  style="width: 40%;" >Duong Dinh Cuong</span>
+			</div>
+			<div class="form-row node-label-email">
+				<label><i class="fa fa-email"></i> <span>Email</span></label>
+				<span class="input-append-left"  style="width: 40%;" >cuong3ihut@gmail.com</span>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="text/javascript">
+	RED.nodes.registerType('cache-server', {
+		category : 'config',
+		defaults : {
+			name : {
+				value : "",
+				required : true
+			},
+			address : {
+				value : "localhost",
+				required : true
+			},
+			port : {
+				value : 6379,
+				required : true,
+				validate : RED.validators.number()
+			}
+		},
+		label : function() {
+			return (this.name ? this.name: this.address + "@" + this.port);
+		},
+		oneditprepare : function() {
+			var tabs = RED.tabs.create({
+				id : "node-config-cache-server-tabs",
+				onchange : function(tab) {
+					$("#node-config-cache-server-tabs-content").children().hide();
+					$("#" + tab.id).show();
+				}
+			});
+			tabs.addTab({
+				id : "cache-server-tab-connection",
+				label : "Queue"
+			});
+			tabs.addTab({
+				id : "cache-server-tab-about",
+				label : "About"
+			});
+			setTimeout(function() {
+				tabs.resize();
+			}, 0);
+		}
+	}); 
+</script>
+
 <script type="text/x-red" data-template-name="http-auth0">
     <div class="form-row">
         <label for="node-input-method"><i class="fa fa-tasks"></i> <span data-i18n="httpin.label.method"></span></label>
