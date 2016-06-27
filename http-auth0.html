@@ -14,26 +14,22 @@
   limitations under the License.
 -->
 
-<script type="text/x-red" data-template-name="cache-server">
+<script type="text/x-red" data-template-name="auth0-server">
 	<div class="form-row">
-		<ul style="background: #fff; min-width: 600px; margin-bottom: 20px;" id="node-config-cache-server-tabs"></ul>
+		<ul style="background: #fff; min-width: 600px; margin-bottom: 20px;" id="node-config-auth0-server-tabs"></ul>
 	</div>
-	<div id="node-config-cache-server-tabs-content" style="min-height: 170px;">
-		<div id="cache-server-tab-connection" style="display:none">
+	<div id="node-config-auth0-server-tabs-content" style="min-height: 170px;">
+		<div id="auth0-server-tab-connection" style="display:none">
 			<div class="form-row node-input-name">
 				<label for="node-config-input-name"><i class="fa fa-globe"></i> <span>Server Name</span></label>
 					<input class="input-append-left" type="text" id="node-config-input-name" placeholder="Enter a server name" style="width: 40%;" >
 			</div>
 			<div class="form-row node-input-address">
-				<label for="node-config-input-address"><i class="fa fa-link"></i> <span>Redis Server</span></label>
-					<input class="input-append-left" type="text" id="node-config-input-address" placeholder="localhost" style="width: 40%;" >
-			</div>
-			<div class="form-row node-input-port">
-				<label for="node-config-input-port"><i class="fa fa-edit"></i> <span>Redis Port</span></label>
-				<input type="number" id="node-config-input-port" placeholder="6379" style="width: 40%;">
-			</div>
+				<label for="node-config-input-address"><i class="fa fa-link"></i> <span>Token Address</span></label>
+					<input class="input-append-left" type="text" id="node-config-input-address" placeholder="https://yourdomain.auth0.com/tokeninfo" style="width: 40%;" >
+			</div>			
 		</div>
-		<div id="cache-server-tab-about" style="display:none">
+		<div id="auth0-server-tab-about" style="display:none">
 			<div class="form-row node-label-author">
 				<label><i class="fa fa-user"></i> <span>Author</span></label>
 				<span class="input-append-left"  style="width: 40%;" >Duong Dinh Cuong</span>
@@ -47,7 +43,7 @@
 </script>
 
 <script type="text/javascript">
-	RED.nodes.registerType('cache-server', {
+	RED.nodes.registerType('auth0-server', {
 		category : 'config',
 		defaults : {
 			name : {
@@ -55,13 +51,8 @@
 				required : true
 			},
 			address : {
-				value : "localhost",
+				value : "https://yourdomain.auth0.com/tokeninfo",
 				required : true
-			},
-			port : {
-				value : 6379,
-				required : true,
-				validate : RED.validators.number()
 			}
 		},
 		label : function() {
@@ -69,18 +60,18 @@
 		},
 		oneditprepare : function() {
 			var tabs = RED.tabs.create({
-				id : "node-config-cache-server-tabs",
+				id : "node-config-auth0-server-tabs",
 				onchange : function(tab) {
-					$("#node-config-cache-server-tabs-content").children().hide();
+					$("#node-config-auth0-server-tabs-content").children().hide();
 					$("#" + tab.id).show();
 				}
 			});
 			tabs.addTab({
-				id : "cache-server-tab-connection",
+				id : "auth0-server-tab-connection",
 				label : "Queue"
 			});
 			tabs.addTab({
-				id : "cache-server-tab-about",
+				id : "auth0-server-tab-about",
 				label : "About"
 			});
 			setTimeout(function() {
@@ -150,6 +141,10 @@
             name: {value:""},
             url: {value:"",required:true},
             method: {value:"get",required:true},
+            auth0 : {
+				type : "auth0-server",
+				required : true
+			},
             swaggerDoc: {type:"swagger-doc", required:false}
         },
         inputs:0,
