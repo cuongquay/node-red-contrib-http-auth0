@@ -196,68 +196,6 @@ module.exports = function(RED) {
             };
 
             var httpMiddleware = function(req, res, next) {				
-				var redis = require('redis');
-				var redisClient = redis.createClient({
-					port: 6379, 
-					host: "localhost",					
-				    retry_strategy: function (options) {
-				        if (options.error.code === 'ECONNREFUSED') {
-				            // End reconnecting on a specific error and flush all commands with a individual error 
-				            return new Error('The server refused the connection');
-				        }
-				        if (options.total_retry_time > 1000 * 60 * 60) {
-				            // End reconnecting after a specific timeout and flush all commands with a individual error 
-				            return new Error('Retry time exhausted');
-				        }
-				        if (options.times_connected > 10) {
-				            // End reconnecting with built in error 
-				            return undefined;
-				        }
-				        // reconnect after 
-				        return Math.max(options.attempt * 100, 3000);
-				    }
-				}).on('error', function(err) {
-					throw err;
-				});
-				
-				function setTokenWithData(token, data, ttl, callback) {
-					if (token == null) throw new Error('Token is null');
-					if (data != null && typeof data !== 'object') throw new Error('data is not an Object');
-				
-					var userData = data || {};
-					userData._ts = new Date();
-				
-					var timeToLive = ttl || auth.TIME_TO_LIVE;
-					if (timeToLive != null && typeof timeToLive !== 'number') throw new Error('TimeToLive is not a Number');
-								
-					redisClient.set(token, JSON.stringify(userData), function(err, reply) {
-						if (err) callback(err);				
-						if (reply) {
-							callback(null, true);
-						} else {
-							callback(new Error('Token not set in redis'));
-						}
-					});
-					
-				};
-				function getDataByToken(token, callback) {
-					if (token == null) callback(new Error('Token is null'));				
-					redisClient.get(token, function(err, userData) {
-						if (err) callback(err);				
-						if (userData != null) callback(null, JSON.parse(userData));
-						else callback(new Error('Token Not Found'));
-					});
-				};
-				function expireToken(token, callback) {
-					if (token == null) callback(new Error('Token is null'));				
-					redisClient.del(token, function(err, reply) {
-						if (err) callback(err);
-				
-						if (reply) callback(null, true);
-						else callback(new Error('Token not found'));
-					});
-				};
-				
 				var request = require('request');
 				var options = {
 				  uri: 'https://fpt-software.auth0.com/tokeninfo',				  
