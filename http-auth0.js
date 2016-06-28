@@ -139,7 +139,6 @@ module.exports = function(RED) {
 			}
 			this.url = n.url;
 			this.method = n.method;
-			this.swaggerDoc = n.swaggerDoc;
 
 			var node = this;
 
