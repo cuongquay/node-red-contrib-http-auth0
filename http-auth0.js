@@ -188,7 +188,7 @@ module.exports = function(RED) {
 					}
 				};
 				request(options, function(error, response, body) {
-					if (!error && response.statusCode == 200) {						
+					if (!error && response.statusCode == 200) {
 						req.tokeninfo = body;
 						req.tokeninfo.authorized = true;
 						if (node.role && req.tokeninfo && req.tokeninfo.roles && 
@@ -200,7 +200,11 @@ module.exports = function(RED) {
 							req.tokeninfo.authorized = false;
 						}
 						if (req.tokeninfo.authorized) {
-							next();	
+							next();
+						} else {
+							response.status(401).end({
+								message : "You are not authorized to perform this request."
+							});
 						}
 					} else {
 						console.log(error, response.statusCode, body);
@@ -267,7 +271,7 @@ module.exports = function(RED) {
 
 
 	RED.nodes.registerType("http-auth0", HTTPAuth0);
-	
+
 	function Auth0ServerSetup(n) {
 		RED.nodes.createNode(this, n);
 		this.connected = false;
@@ -286,7 +290,7 @@ module.exports = function(RED) {
 			node.usecount -= 1;
 			if (node.usecount == 0) {
 			}
-		};		
+		};
 		this.getTokenAddress = function() {
 			return node.address;
 		};
