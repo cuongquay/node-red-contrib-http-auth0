@@ -130,6 +130,9 @@ module.exports = function(RED) {
 
 	function HTTPAuth0(n) {
 		RED.nodes.createNode(this, n);
+		this.name = n.name;
+		this.role = n.role;
+		this.group = n.group;
 		this.auth0 = n.auth0;
 		this.Auth0 = RED.nodes.getNode(this.auth0);
 		if (RED.settings.httpNodeRoot !== false) {
@@ -185,9 +188,18 @@ module.exports = function(RED) {
 					}
 				};
 				request(options, function(error, response, body) {
-					if (!error && response.statusCode == 200) {
+					if (!error && response.statusCode == 200) {						
 						req.tokeninfo = body;
-						next();
+						req.tokeninfo.authorized = true;
+						if (node.role && req.tokeninfo.roles.indexOf(node.role) == -1) {
+							req.tokeninfo.authorized = false;
+						}
+						if (node.group && req.tokeninfo.groups.indexOf(node.group) == -1) {
+							req.tokeninfo.authorized = false;
+						}
+						if (req.tokeninfo.authorized) {
+							next();	
+						}
 					} else {
 						console.log(error, response.statusCode, body);
 					}

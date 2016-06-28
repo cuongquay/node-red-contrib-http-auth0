@@ -104,6 +104,14 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
         <input type="text" id="node-input-name" placeholder="Enter a name">
     </div>
+    <div class="form-row">
+        <label for="node-input-role"><i class="fa fa-support"></i> <span>Role</span></label>
+        <input type="text" id="node-input-role" placeholder="administrator">
+    </div>
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-group"></i> <span>Group</span></label>
+        <input type="text" id="node-input-group" placeholder="Administrator">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="http-auth0">
@@ -138,6 +146,8 @@
         color:"#FFCC66",
         defaults: {
             name: {value:""},
+            role: {value:""},
+            group: {value:""},
             url: {value:"",required:true},
             method: {value:"get",required:true},
             auth0 : {
