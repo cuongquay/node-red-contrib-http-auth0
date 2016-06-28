@@ -189,7 +189,7 @@ module.exports = function(RED) {
 				};
 				request(options, function(error, response, body) {
 					if (!error && response.statusCode == 200) {
-						req.tokeninfo = body;
+						req.tokeninfo = body || {};
 						req.tokeninfo.authorized = true;
 						if (node.role && req.tokeninfo && req.tokeninfo.roles && 
 							req.tokeninfo.roles.indexOf(node.role) == -1) {
