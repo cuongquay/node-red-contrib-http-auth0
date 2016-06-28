@@ -179,7 +179,7 @@ module.exports = function(RED) {
 
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
-				console.log("httpMiddleware", node.Auth0.getTokenAddress());
+				node.log("httpMiddleware:" + node.Auth0.getTokenAddress());
 				var options = {
 					uri : node.Auth0.getTokenAddress(),
 					method : 'POST',
@@ -203,11 +203,18 @@ module.exports = function(RED) {
 							next();
 						} else {
 							res.status(401).end(JSON.stringify({
+								required : {
+									role: node.role,
+									group: node.group,
+								},
 								message : "You are not authorized to perform this request."
 							}));
 						}
 					} else {
-						console.log(error, response.statusCode, body);
+						node.log(error, response.statusCode, body);
+						res.status(503).end(JSON.stringify({
+							message : "The authentication service is unavailable."
+						}));
 					}
 				});
 			};
