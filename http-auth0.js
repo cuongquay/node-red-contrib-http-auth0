@@ -202,6 +202,7 @@ module.exports = function(RED) {
 						if (req.tokeninfo.authorized) {
 							next();
 						} else {
+							res.setHeader('Content-Type', 'application/json');
 							res.status(401).end(JSON.stringify({
 								required : {
 									role: node.role,
@@ -212,6 +213,7 @@ module.exports = function(RED) {
 						}
 					} else {
 						node.log(error, response.statusCode, body);
+						res.setHeader('Content-Type', 'application/json');
 						res.status(503).end(JSON.stringify({
 							message : "The authentication service is unavailable."
 						}));
