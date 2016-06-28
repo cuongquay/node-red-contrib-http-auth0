@@ -202,9 +202,9 @@ module.exports = function(RED) {
 						if (req.tokeninfo.authorized) {
 							next();
 						} else {
-							response.status(401).end({
+							res.status(401).end(JSON.stringify({
 								message : "You are not authorized to perform this request."
-							});
+							}));
 						}
 					} else {
 						console.log(error, response.statusCode, body);
