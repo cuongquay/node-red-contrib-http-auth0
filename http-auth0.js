@@ -186,7 +186,7 @@ module.exports = function(RED) {
 				};
 				request(options, function(error, response, body) {
 					if (!error && response.statusCode == 200) {
-						req.body.tokeninfo = body;
+						req.tokeninfo = body;
 						next();
 					} else {
 						console.log(error, response.statusCode, body);
