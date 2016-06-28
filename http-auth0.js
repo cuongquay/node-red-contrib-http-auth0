@@ -176,6 +176,7 @@ module.exports = function(RED) {
 
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
+				console.log("httpMiddleware", node.Auth0.getTokenAddress());
 				var options = {
 					uri : node.Auth0.getTokenAddress(),
 					method : 'POST',
@@ -187,6 +188,8 @@ module.exports = function(RED) {
 					if (!error && response.statusCode == 200) {
 						req.body.tokeninfo = body;
 						next();
+					} else {
+						console.log(error, response.statusCode, body);
 					}
 				});
 			};
