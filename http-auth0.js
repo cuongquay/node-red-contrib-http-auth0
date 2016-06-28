@@ -191,10 +191,10 @@ module.exports = function(RED) {
 					if (!error && response.statusCode == 200) {						
 						req.tokeninfo = body;
 						req.tokeninfo.authorized = true;
-						if (node.role && req.tokeninfo.roles.indexOf(node.role) == -1) {
+						if (node.role && req.tokeninfo.roles && req.tokeninfo.roles.indexOf(node.role) == -1) {
 							req.tokeninfo.authorized = false;
 						}
-						if (node.group && req.tokeninfo.groups.indexOf(node.group) == -1) {
+						if (node.group && req.tokeninfo.groups && req.tokeninfo.groups.indexOf(node.group) == -1) {
 							req.tokeninfo.authorized = false;
 						}
 						if (req.tokeninfo.authorized) {
