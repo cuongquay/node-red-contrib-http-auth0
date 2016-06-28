@@ -211,8 +211,7 @@ module.exports = function(RED) {
 								message : "You are not authorized to perform this request."
 							}));
 						}
-					} else {
-						node.log(error, response.statusCode, body);
+					} else {						
 						res.setHeader('Content-Type', 'application/json');
 						res.status(503).end(JSON.stringify({
 							message : "The authentication service is unavailable."
