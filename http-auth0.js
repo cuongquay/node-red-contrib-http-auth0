@@ -130,7 +130,8 @@ module.exports = function(RED) {
 
 	function HTTPAuth0(n) {
 		RED.nodes.createNode(this, n);
-		this.auth0 = RED.nodes.getNode(this.auth0);
+		this.auth0 = n.auth0;
+		this.Auth0 = RED.nodes.getNode(this.auth0);
 		if (RED.settings.httpNodeRoot !== false) {
 
 			if (!n.url) {
@@ -176,7 +177,7 @@ module.exports = function(RED) {
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
 				var options = {
-					uri : node.auth0.address,
+					uri : node.Auth0.getTokenAddress(),
 					method : 'POST',
 					json : {
 						id_token : req.headers.authorization.substring(7)
@@ -258,7 +259,6 @@ module.exports = function(RED) {
 		// Config node state
 		this.name = n.name;
 		this.address = n.address;
-		this.port = n.port;
 
 		var node = this;
 		this.register = function() {
@@ -270,6 +270,9 @@ module.exports = function(RED) {
 			if (node.usecount == 0) {
 			}
 		};		
+		this.getTokenAddress = function() {
+			return node.address;
+		};
 
 		this.on('close', function(closecomplete) {
 			if (this.connected) {
