@@ -3,6 +3,7 @@ Yet another [http in] with auth0 authentication provider to verify every incomin
 
 [![npm version](https://badge.fury.io/js/node-red-contrib-http-auth0.svg)](https://badge.fury.io/js/node-red-contrib-http-auth0)
 
+https://codeship.com/projects/161369/status?branch=master
 
 Currently it supports only **Bearer** token which is taken from **id_token** parameter.
 
