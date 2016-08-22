@@ -12,11 +12,11 @@ The first thing to do you need to register an account at https://auth0.com/ then
 ```
 
 2. Edit the http-auth0 node with your *Domain* value above in the Account setting panel.
-```
-- By default, it checks for the valid auth0's token and pass the request to the downstream node.
-- Request is authorized if the **role** value is set to the auth0 user's role value. Usually setup by https://manage.auth0.com/#/rules
-- Request is authorized if the **group** value is set to the auth0 user's group value. Usually setup by installing the **Auth0 Authorization 1.4 extension**
-```
+
++++ By default, it checks for the valid auth0's token and pass the request to the downstream node.
++++ Request is authorized if the **role** value is set to the auth0 user's role value. Usually setup by https://manage.auth0.com/#/rules
++++ Request is authorized if the **group** value is set to the auth0 user's group value. Usually setup by installing the **Auth0 Authorization 1.4 extension**
+
 3. Try to get your auth0's id_token from your auth0 application and pass it into the Authorization Header
 
 Currently it supports only **Bearer** token which is taken from **id_token** parameter.
