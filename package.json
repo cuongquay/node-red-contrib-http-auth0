@@ -1,6 +1,6 @@
 {
 	"name": "node-red-contrib-http-auth0",
-	"version": "0.1.11",
+	"version": "0.1.12",
 	"description": "Yet another [http in] with auth0 authentication provider to verify every incoming requests containing oauth2_token.",
 	"dependencies": {
 		"body-parser": "1.15.1",
