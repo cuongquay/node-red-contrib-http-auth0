@@ -176,7 +176,22 @@ module.exports = function(RED) {
 					});
 				}
 			};
-
+			
+			function parseBearerToken(req) {
+				var auth;
+				if (!req.headers || !( auth = req.headers.authorization)) {
+					return null;
+				}
+				var parts = auth.split(' ');
+				if (2 > parts.length)
+					return null;
+				var schema = parts.shift().toLowerCase();
+				var token = parts.join(' ');
+				if ('bearer' != schema)
+					return null;
+				return token;
+			}
+			
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
 				node.log("httpMiddleware:" + node.Auth0.getTokenAddress());
@@ -184,19 +199,17 @@ module.exports = function(RED) {
 					uri : node.Auth0.getTokenAddress(),
 					method : 'POST',
 					json : {
-						id_token : req.headers.authorization.substring(7)
+						id_token : parseBearerToken(req)
 					}
 				};
 				request(options, function(error, response, body) {
 					if (!error && response.statusCode == 200) {
 						req.tokeninfo = body || {};
 						req.tokeninfo.authorized = true;
-						if (node.role && req.tokeninfo && req.tokeninfo.roles && 
-							req.tokeninfo.roles.indexOf(node.role) == -1) {
+						if (node.role && req.tokeninfo && req.tokeninfo.roles && req.tokeninfo.roles.indexOf(node.role) == -1) {
 							req.tokeninfo.authorized = false;
 						}
-						if (node.group && req.tokeninfo && req.tokeninfo.groups && 
-							req.tokeninfo.groups.indexOf(node.group) == -1) {
+						if (node.group && req.tokeninfo && req.tokeninfo.groups && req.tokeninfo.groups.indexOf(node.group) == -1) {
 							req.tokeninfo.authorized = false;
 						}
 						if (req.tokeninfo.authorized) {
@@ -205,13 +218,13 @@ module.exports = function(RED) {
 							res.setHeader('Content-Type', 'application/json');
 							res.status(401).end(JSON.stringify({
 								required : {
-									role: node.role,
-									group: node.group,
+									role : node.role,
+									group : node.group,
 								},
 								message : "You are not authorized to perform this request."
 							}));
 						}
-					} else {						
+					} else {
 						res.setHeader('Content-Type', 'application/json');
 						res.status(503).end(JSON.stringify({
 							message : "The authentication service is unavailable."
