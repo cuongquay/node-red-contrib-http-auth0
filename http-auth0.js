@@ -216,18 +216,18 @@ module.exports = function(RED) {
 							next();
 						} else {
 							res.setHeader('Content-Type', 'application/json');
-							res.status(401).end(JSON.stringify({
+							res.status(403).end(JSON.stringify({
 								required : {
 									role : node.role,
 									group : node.group,
 								},
-								message : "You are not authorized to perform this request."
+								message : "Require Role:'" + node.role + "' and Group:'" + node.group +"' to access the requested resource."
 							}));
 						}
 					} else {
 						res.setHeader('Content-Type', 'application/json');
-						res.status(503).end(JSON.stringify({
-							message : "The authentication service is unavailable."
+						res.status(401).end(JSON.stringify({
+							message : "The JWT token '" + options.json.id_token + "' is invalid."
 						}));
 					}
 				});
