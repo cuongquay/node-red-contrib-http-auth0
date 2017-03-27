@@ -24,6 +24,10 @@
 		"type": "git",
 		"url": "https://github.com/cuongquay/node-red-contrib-http-auth0"
 	},
+	"scripts": {
+		"prepare": "mversion patch -mn 'Patch new version and publish'",
+		"postpublish": "git push && git push --tags"
+	},
 	"author": {
 		"name": "DUONG Dinh Cuong",
 		"email": "cuong3ihut@gmail.com"
