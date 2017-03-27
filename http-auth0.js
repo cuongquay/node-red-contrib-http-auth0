@@ -221,7 +221,7 @@ module.exports = function(RED) {
 									role : node.role,
 									group : node.group,
 								},
-								message : "Require Role:'" + node.role + "' and Group:'" + node.group +"' to access the requested resource."
+								message : "Require ROLE:'" + node.role + "' and GROUP:'" + node.group +"' to access the requested resource."
 							}));
 						}
 					} else {
