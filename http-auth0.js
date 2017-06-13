@@ -200,9 +200,16 @@ module.exports = function(RED) {
 					jwt.verify(parseBearerToken(req), new Buffer(auth0TokenSecret, 'base64'), function(err, decoded) {
 						if (!err) {
 							node.log("httpMiddleware:" + decoded);
+							req.tokeninfo = {
+								user_id : decoded.sub
+							};
 							next();
 						} else {
 							node.log("httpMiddleware:" + err);
+							res.setHeader('Content-Type', 'application/json');
+							res.status(401).end(JSON.stringify({
+								message : "The JWT token '" + options.json.id_token + "' is invalid."
+							}));
 						}
 					});
 				} else {
