@@ -197,8 +197,8 @@ module.exports = function(RED) {
 				var jwt = require('jsonwebtoken');
 				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET;
 				if (auth0TokenSecret && !node.role && !node.group) {					
-					jwt.verify(parseBearerToken(req), new Buffer(auth0TokenSecret, 'base64'), function(err, decoded) {
-						if (!err) {
+					jwt.verify(parseBearerToken(req), new Buffer(auth0TokenSecret, 'base64'), function(tokenError, decoded) {
+						if (!tokenError) {
 							node.log("httpMiddleware:" + decoded);
 							req.tokeninfo = {
 								user_id : decoded.sub,
