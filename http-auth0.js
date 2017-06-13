@@ -211,7 +211,7 @@ module.exports = function(RED) {
 							node.log("httpMiddleware:" + err);
 							res.setHeader('Content-Type', 'application/json');
 							res.status(401).end(JSON.stringify({
-								message : "The JWT token '" + options.json.id_token + "' is invalid."
+								message : "The JWT token '" + parseBearerToken(req) + "' is invalid."
 							}));
 						}
 					});
