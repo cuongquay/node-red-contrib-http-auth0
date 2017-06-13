@@ -208,10 +208,10 @@ module.exports = function(RED) {
 							};
 							next();
 						} else {
-							node.log("httpMiddleware:" + err);
+							node.log("httpMiddleware:" + tokenError);
 							res.setHeader('Content-Type', 'application/json');
 							res.status(401).end(JSON.stringify({
-								message : "The JWT token '" + parseBearerToken(req) + "' is invalid."
+								message : tokenError
 							}));
 						}
 					});
