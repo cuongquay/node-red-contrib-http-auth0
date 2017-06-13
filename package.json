@@ -9,9 +9,10 @@
 		"cors": "2.7.1",
 		"on-headers": "1.0.1",
 		"media-typer": "0.3.0",
-		"is-utf8": ">=0.2.1",
-		"request": ">=2.72.0",
-		"q": ">=1.4.1"
+		"is-utf8": "^0.2.1",
+		"request": "^2.81.0",
+		"jsonwebtoken": "^7.4.1",
+		"q": "^1.5.1"
 	},
 	"license": "MIT",
 	"keywords": [

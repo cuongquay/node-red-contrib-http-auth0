@@ -176,7 +176,7 @@ module.exports = function(RED) {
 					});
 				}
 			};
-			
+
 			function parseBearerToken(req) {
 				var auth;
 				if (!req.headers || !( auth = req.headers.authorization)) {
@@ -191,46 +191,59 @@ module.exports = function(RED) {
 					return null;
 				return token;
 			}
-			
+
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
-				node.log("httpMiddleware:" + node.Auth0.getTokenAddress());
-				var options = {
-					uri : node.Auth0.getTokenAddress(),
-					method : 'POST',
-					json : {
-						id_token : parseBearerToken(req)
-					}
-				};
-				request(options, function(error, response, body) {
-					if (!error && response.statusCode == 200) {
-						req.tokeninfo = body || {};
-						req.tokeninfo.authorized = true;
-						if (node.role && req.tokeninfo && req.tokeninfo.roles && req.tokeninfo.roles.indexOf(node.role) == -1) {
-							req.tokeninfo.authorized = false;
-						}
-						if (node.group && req.tokeninfo && req.tokeninfo.groups && req.tokeninfo.groups.indexOf(node.group) == -1) {
-							req.tokeninfo.authorized = false;
-						}
-						if (req.tokeninfo.authorized) {
+				var jwt = require('jsonwebtoken');
+				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET;
+				if (auth0TokenSecret) {					
+					jwt.verify(parseBearerToken(req), new Buffer(auth0TokenSecret, 'base64'), function(err, decoded) {
+						if (!err) {
+							node.log("httpMiddleware:" + decoded);
 							next();
 						} else {
+							node.log("httpMiddleware:" + err);
+						}
+					});
+				} else {
+					node.log("httpMiddleware:" + node.Auth0.getTokenAddress());
+					var options = {
+						uri : node.Auth0.getTokenAddress(),
+						method : 'POST',
+						json : {
+							id_token : parseBearerToken(req)
+						}
+					};
+					request(options, function(error, response, body) {
+						if (!error && response.statusCode == 200) {
+							req.tokeninfo = body || {};
+							req.tokeninfo.authorized = true;
+							if (node.role && req.tokeninfo && req.tokeninfo.roles && req.tokeninfo.roles.indexOf(node.role) == -1) {
+								req.tokeninfo.authorized = false;
+							}
+							if (node.group && req.tokeninfo && req.tokeninfo.groups && req.tokeninfo.groups.indexOf(node.group) == -1) {
+								req.tokeninfo.authorized = false;
+							}
+							if (req.tokeninfo.authorized) {
+								next();
+							} else {
+								res.setHeader('Content-Type', 'application/json');
+								res.status(403).end(JSON.stringify({
+									required : {
+										role : node.role,
+										group : node.group,
+									},
+									message : "Require ROLE:'" + node.role + "' and GROUP:'" + node.group + "' to access the requested resource."
+								}));
+							}
+						} else {
 							res.setHeader('Content-Type', 'application/json');
-							res.status(403).end(JSON.stringify({
-								required : {
-									role : node.role,
-									group : node.group,
-								},
-								message : "Require ROLE:'" + node.role + "' and GROUP:'" + node.group +"' to access the requested resource."
+							res.status(401).end(JSON.stringify({
+								message : "The JWT token '" + options.json.id_token + "' is invalid."
 							}));
 						}
-					} else {
-						res.setHeader('Content-Type', 'application/json');
-						res.status(401).end(JSON.stringify({
-							message : "The JWT token '" + options.json.id_token + "' is invalid."
-						}));
-					}
-				});
+					});
+				}
 			};
 
 			if (RED.settings.httpNodeMiddleware) {
