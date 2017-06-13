@@ -195,33 +195,16 @@ module.exports = function(RED) {
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
 				var jwt = require('jsonwebtoken');
+				var jwtToken = parseBearerToken(req);
+				var tokenProviderUrl = node.Auth0.getTokenAddress();
 				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET;
-				if (auth0TokenSecret && !node.role && !node.group) {					
-					jwt.verify(parseBearerToken(req), new Buffer(auth0TokenSecret, 'base64'), function(tokenError, decoded) {
-						if (!tokenError) {
-							node.log("httpMiddleware:" + decoded);
-							req.tokeninfo = {
-								user_id : decoded.sub,
-								tenant_id: decoded.aud,
-								issuer: decoded.iss,
-								expired: decoded.exp
-							};
-							next();
-						} else {
-							node.log("httpMiddleware:" + tokenError);
-							res.setHeader('Content-Type', 'application/json');
-							res.status(401).end(JSON.stringify({
-								message : tokenError
-							}));
-						}
-					});
-				} else {
+				function requestWithRBAC(req, res, next) {
 					node.log("httpMiddleware:" + node.Auth0.getTokenAddress());
 					var options = {
-						uri : node.Auth0.getTokenAddress(),
+						uri : tokenProviderUrl,
 						method : 'POST',
 						json : {
-							id_token : parseBearerToken(req)
+							id_token : jwtToken
 						}
 					};
 					request(options, function(error, response, body) {
@@ -253,6 +236,34 @@ module.exports = function(RED) {
 							}));
 						}
 					});
+				}
+				if (auth0TokenSecret) {					
+					jwt.verify(jwtToken, new Buffer(auth0TokenSecret, 'base64'), function(tokenError, decoded) {
+						if (!tokenError) {							
+							node.log("httpMiddleware:" + decoded);
+							if (!node.role && !node.group) {
+								req.tokeninfo = {
+									user_id : decoded.sub,
+									tenant_id: decoded.aud,
+									issuer: decoded.iss,
+									expired: decoded.exp
+								};
+								next();	
+							} else {
+								tokenProviderUrl = decoded.iss;
+								requestWithRBAC(req, res, next);
+							}
+						} else {
+							node.log("httpMiddleware:" + tokenError);
+							res.setHeader('Content-Type', 'application/json');
+							res.status(401).end(JSON.stringify({
+								message : tokenError
+							}));
+						}
+					});
+				} else {
+					tokenProviderUrl = node.Auth0.getTokenAddress();
+					requestWithRBAC(req, res, next);
 				}
 			};
 
