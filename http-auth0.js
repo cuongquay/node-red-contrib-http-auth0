@@ -199,7 +199,7 @@ module.exports = function(RED) {
 				var tokenProviderUrl = node.Auth0.getTokenAddress();
 				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET || node.Auth0.getTokenSecret();
 				function requestWithRBAC(req, res, next) {
-					node.log("httpMiddleware:" + node.Auth0.getTokenAddress());
+					node.log("httpMiddleware:" + tokenProviderUrl);
 					var options = {
 						uri : tokenProviderUrl,
 						method : 'POST',
@@ -240,17 +240,17 @@ module.exports = function(RED) {
 				if (auth0TokenSecret) {					
 					jwt.verify(jwtToken, new Buffer(auth0TokenSecret, 'base64'), function(tokenError, decoded) {
 						if (!tokenError) {							
-							node.log("httpMiddleware:" + decoded);
-							if (!node.role && !node.group) {
+							node.log("httpMiddleware:" + decoded.aud);
+							if (node.role === "" && node.group === "") {
 								req.tokeninfo = {
 									user_id : decoded.sub,
-									tenant_id: decoded.aud,
+									client_id: decoded.aud,
 									issuer: decoded.iss,
 									expired: decoded.exp
 								};
 								next();	
 							} else {
-								tokenProviderUrl = decoded.iss;
+								tokenProviderUrl = decoded.iss + "tokeninfo";
 								requestWithRBAC(req, res, next);
 							}
 						} else {
@@ -261,7 +261,7 @@ module.exports = function(RED) {
 							}));
 						}
 					});
-				} else {
+				} else {					
 					tokenProviderUrl = node.Auth0.getTokenAddress();
 					requestWithRBAC(req, res, next);
 				}
