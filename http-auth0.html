@@ -28,6 +28,10 @@
 				<label for="node-config-input-address"><i class="fa fa-link"></i> <span>Token Info</span></label>
 					<input class="input-append-left" type="text" id="node-config-input-address" placeholder="https://yourdomain.auth0.com/tokeninfo" style="width: 40%;" >
 			</div>
+			<div class="form-row node-input-secret">
+				<label for="node-config-input-secret"><i class="fa fa-password"></i> <span>Client Secret</span></label>
+					<input class="input-append-left" type="password" id="node-config-input-secret" placeholder="Auth0 Client Secret" style="width: 40%;" >
+			</div>
 		</div>
 		<div id="auth0-server-tab-about" style="display:none">
 			<div class="form-row node-label-author">
@@ -53,6 +57,9 @@
 			address : {
 				value : "https://yourdomain.auth0.com/tokeninfo",
 				required : true
+			},
+			secret : {
+				value : ""
 			}
 		},
 		label : function() {

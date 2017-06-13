@@ -197,7 +197,7 @@ module.exports = function(RED) {
 				var jwt = require('jsonwebtoken');
 				var jwtToken = parseBearerToken(req);
 				var tokenProviderUrl = node.Auth0.getTokenAddress();
-				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET;
+				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET || node.Auth0.getTokenSecret();
 				function requestWithRBAC(req, res, next) {
 					node.log("httpMiddleware:" + node.Auth0.getTokenAddress());
 					var options = {
@@ -335,6 +335,7 @@ module.exports = function(RED) {
 		// Config node state
 		this.name = n.name;
 		this.address = n.address;
+		this.secret = n.secret;
 
 		var node = this;
 		this.register = function() {
@@ -348,6 +349,9 @@ module.exports = function(RED) {
 		};
 		this.getTokenAddress = function() {
 			return node.address;
+		};
+		this.getTokenSecret = function() {
+			return node.secret;
 		};
 
 		this.on('close', function(closecomplete) {
