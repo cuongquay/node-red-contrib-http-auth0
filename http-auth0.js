@@ -243,10 +243,10 @@ module.exports = function(RED) {
 							node.log("httpMiddleware:" + decoded.aud);
 							if (node.role === "" && node.group === "") {
 								req.tokeninfo = {
-									user_id : decoded.sub,
+									user_id: decoded.sub,
 									client_id: decoded.aud,
-									issuer: decoded.iss,
-									expired: decoded.exp
+									user_info: decoded.iss + "tokeninfo",
+									jwt_token: jwtToken
 								};
 								next();	
 							} else {
