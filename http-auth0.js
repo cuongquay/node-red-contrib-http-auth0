@@ -201,7 +201,10 @@ module.exports = function(RED) {
 						if (!err) {
 							node.log("httpMiddleware:" + decoded);
 							req.tokeninfo = {
-								user_id : decoded.sub
+								user_id : decoded.sub,
+								tenant_id: decoded.aud,
+								issuer: decoded.iss,
+								expired: decoded.exp
 							};
 							next();
 						} else {
