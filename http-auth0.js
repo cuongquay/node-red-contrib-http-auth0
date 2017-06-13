@@ -209,8 +209,9 @@ module.exports = function(RED) {
 					};
 					request(options, function(error, response, body) {
 						if (!error && response.statusCode == 200) {
-							req.tokeninfo = body || {};
+							req.tokeninfo = body || { user_id: "auth0|anonymous" };
 							req.tokeninfo.authorized = true;
+							req.tokeninfo.email = req.tokeninfo.email || req.tokeninfo.user_id.replace('|', '@');
 							if (node.role && req.tokeninfo && req.tokeninfo.roles && req.tokeninfo.roles.indexOf(node.role) == -1) {
 								req.tokeninfo.authorized = false;
 							}
