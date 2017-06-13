@@ -196,7 +196,7 @@ module.exports = function(RED) {
 				var request = require('request');
 				var jwt = require('jsonwebtoken');
 				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET;
-				if (auth0TokenSecret) {					
+				if (auth0TokenSecret && !node.role && !node.group) {					
 					jwt.verify(parseBearerToken(req), new Buffer(auth0TokenSecret, 'base64'), function(err, decoded) {
 						if (!err) {
 							node.log("httpMiddleware:" + decoded);
