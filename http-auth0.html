@@ -118,14 +118,28 @@
         <label for="node-input-group"><i class="fa fa-group"></i> <span>Group</span></label>
         <input type="text" id="node-input-group" placeholder="Administrator">
     </div>
+    <div class="form-row">
+        <label for="node-input-maxage"><i class="fa fa-number"></i> <span>Max-age</span></label>
+        <input type="number" id="node-input-maxage" placeholder="Cookie Max-age" value="900000">
+    </div>
+    <div class="form-row">
+		<input type="checkbox" id="node-input-internal" style="display: inline-block; width: auto; vertical-align: top;">
+		<label for="node-input-internal" style="width: auto;">JWT validation with exported AUTH0_CLIENT_SECRET (or Auth0 settings)</label>
+	</div>
 </script>
 
 <script type="text/x-red" data-help-name="http-auth0">
-    <p>Provides an input node for http requests, allowing the creation of simple web services.</p>
-    <p>The resulting message has the following properties:
+    <p>Provides an input node for http requests with JWT authentication validation and RBAC, allowing the creation of secured web or microservices.</p>
+    <p>
+       By default, this expects the header of the request must contains:
+       <pre>Authorization: Bearer JWT_TOKEN_ENCODED</pre>
+       If AUTH0_CLIENT_SECRET is not exported in <i>process.env</i> or configured in Auth0 settings, 
+       it requires an external request to <b>Token Info</b> URL for validation access 
+       checking and get user profile with qualified Roles and Groups. 
+    </p>
+    <p>The result message has added the following properties in <b>msg.req</b>:
         <ul>
-            <li>msg.req : <a href="http://expressjs.com/api.html#req">http request</a></li>
-            <li>msg.res : <a href="http://expressjs.com/api.html#res">http response</a></li>
+            <li>msg.req.tokeninfo : { user_id: ... }</li>
         </ul>
     </p>
     <p>For POST/PUT requests, the body is available under <code>msg.req.body</code>. This
@@ -154,6 +168,8 @@
             name: {value:""},
             role: {value:""},
             group: {value:""},
+            maxage: {value: 900000},
+            internal: {value: false, required:true},
             url: {value:"",required:true},
             method: {value:"get",required:true},
             auth0 : {

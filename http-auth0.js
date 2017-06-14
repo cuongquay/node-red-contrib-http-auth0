@@ -132,8 +132,10 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, n);
 		this.name = n.name;
 		this.role = n.role;
-		this.group = n.group;
+		this.group = n.group;		
 		this.auth0 = n.auth0;
+		this.cookieMaxAge = n.maxage;
+		this.jwtInternalCheckOnly = n.internal;
 		this.Auth0 = RED.nodes.getNode(this.auth0);
 		if (RED.settings.httpNodeRoot !== false) {
 
@@ -194,11 +196,17 @@ module.exports = function(RED) {
 
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
-				var jwt = require('jsonwebtoken');
-				var jwtToken = parseBearerToken(req);
+				var jwt = require('jsonwebtoken');							
+				var jwtToken = req.cookies['id_token'] || parseBearerToken(req);
 				var tokenProviderUrl = node.Auth0.getTokenAddress();
 				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET || node.Auth0.getTokenSecret();
-				function requestWithRBAC(req, res, next) {
+				
+				if (!req.cookies['id_token'] && jwtToken) {
+					node.log("httpMiddleware: SET COOKIE " + jwtToken.substring(0, 10));
+					res.cookie('id_token', jwtToken, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+				}
+				
+				function requestTokenInfo(req, res, next) {
 					node.log("httpMiddleware:" + tokenProviderUrl);
 					var options = {
 						uri : tokenProviderUrl,
@@ -212,13 +220,16 @@ module.exports = function(RED) {
 							req.tokeninfo = body || { user_id: "auth0|anonymous" };
 							req.tokeninfo.authorized = true;
 							req.tokeninfo.email = req.tokeninfo.email || req.tokeninfo.user_id.replace('|', '@');
-							if (node.role && req.tokeninfo && req.tokeninfo.roles && req.tokeninfo.roles.indexOf(node.role) == -1) {
+							if (node.role && req.tokeninfo && req.tokeninfo.roles && req.tokeninfo.roles.indexOf(node.role) == -1) {								
 								req.tokeninfo.authorized = false;
 							}
 							if (node.group && req.tokeninfo && req.tokeninfo.groups && req.tokeninfo.groups.indexOf(node.group) == -1) {
 								req.tokeninfo.authorized = false;
-							}
+							}							
 							if (req.tokeninfo.authorized) {
+								res.cookie('email', req.tokeninfo.email, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+								res.cookie('roles', req.tokeninfo.roles, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+								res.cookie('groups', req.tokeninfo.groups, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
 								next();
 							} else {
 								res.setHeader('Content-Type', 'application/json');
@@ -238,21 +249,24 @@ module.exports = function(RED) {
 						}
 					});
 				}
-				if (auth0TokenSecret) {					
+				if (auth0TokenSecret && node.jwtInternalCheckOnly) {					
 					jwt.verify(jwtToken, new Buffer(auth0TokenSecret, 'base64'), function(tokenError, decoded) {
 						if (!tokenError) {							
 							node.log("httpMiddleware:" + decoded.aud);
-							if (node.role === "" && node.group === "") {
+							if (!req.cookies['email']) {
+								tokenProviderUrl = decoded.iss + "tokeninfo";
+								requestTokenInfo(req, res, next);
+							} else {
 								req.tokeninfo = {
 									user_id: decoded.sub,
+									email: req.cookies['email'],
+									roles: req.cookies['roles'],
+									groups: req.cookies['groups'],
 									client_id: decoded.aud,
 									user_info: decoded.iss + "tokeninfo",
 									jwt_token: jwtToken
 								};
-								next();	
-							} else {
-								tokenProviderUrl = decoded.iss + "tokeninfo";
-								requestWithRBAC(req, res, next);
+								next();
 							}
 						} else {
 							node.log("httpMiddleware:" + tokenError);
@@ -262,9 +276,9 @@ module.exports = function(RED) {
 							}));
 						}
 					});
-				} else {					
+				} else {
 					tokenProviderUrl = node.Auth0.getTokenAddress();
-					requestWithRBAC(req, res, next);
+					requestTokenInfo(req, res, next);
 				}
 			};
 
