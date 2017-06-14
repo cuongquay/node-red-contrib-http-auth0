@@ -134,7 +134,7 @@ module.exports = function(RED) {
 		this.role = n.role;
 		this.group = n.group;		
 		this.auth0 = n.auth0;
-		this.cookieMaxAge = n.maxage;
+		this.cookieMaxAge = Number(n.maxage || 9000);
 		this.jwtInternalCheckOnly = n.internal;
 		this.Auth0 = RED.nodes.getNode(this.auth0);
 		if (RED.settings.httpNodeRoot !== false) {
@@ -196,14 +196,14 @@ module.exports = function(RED) {
 
 			var httpMiddleware = function(req, res, next) {
 				var request = require('request');
-				var jwt = require('jsonwebtoken');							
+				var jwt = require('jsonwebtoken');
 				var jwtToken = req.cookies['id_token'] || parseBearerToken(req);
 				var tokenProviderUrl = node.Auth0.getTokenAddress();
 				var auth0TokenSecret = process.env.AUTH0_CLIENT_SECRET || node.Auth0.getTokenSecret();
 				
 				if (!req.cookies['id_token'] && jwtToken) {
 					node.log("httpMiddleware: SET COOKIE " + jwtToken.substring(0, 10));
-					res.cookie('id_token', jwtToken, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+					res.cookie('id_token', jwtToken, { maxAge: node.cookieMaxAge, httpOnly: true });
 				}
 				
 				function requestTokenInfo(req, res, next) {
