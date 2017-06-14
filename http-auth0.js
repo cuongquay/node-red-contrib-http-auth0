@@ -134,7 +134,7 @@ module.exports = function(RED) {
 		this.role = n.role;
 		this.group = n.group;		
 		this.auth0 = n.auth0;
-		this.cookieMaxAge = Number(n.maxage || 9000);
+		this.cookieMaxAge = Number(n.maxage || 900000);
 		this.jwtInternalCheckOnly = n.internal;
 		this.Auth0 = RED.nodes.getNode(this.auth0);
 		if (RED.settings.httpNodeRoot !== false) {
@@ -227,9 +227,11 @@ module.exports = function(RED) {
 								req.tokeninfo.authorized = false;
 							}							
 							if (req.tokeninfo.authorized) {
-								res.cookie('email', req.tokeninfo.email, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
-								res.cookie('roles', req.tokeninfo.roles, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
-								res.cookie('groups', req.tokeninfo.groups, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+								if (!req.cookies['email']) {
+									res.cookie('email', req.tokeninfo.email, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+									res.cookie('roles', req.tokeninfo.roles, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+									res.cookie('groups', req.tokeninfo.groups, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+								}
 								next();
 							} else {
 								res.setHeader('Content-Type', 'application/json');
