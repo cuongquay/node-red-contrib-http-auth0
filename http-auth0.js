@@ -134,8 +134,7 @@ module.exports = function(RED) {
 		this.role = n.role;
 		this.group = n.group;		
 		this.auth0 = n.auth0;
-		this.cookieMaxAge = Number(n.maxage || 900000);
-		this.jwtInternalCheckOnly = n.internal;
+		this.cookieMaxAge = Number(n.maxage || 900000);		
 		this.Auth0 = RED.nodes.getNode(this.auth0);
 		if (RED.settings.httpNodeRoot !== false) {
 
@@ -251,7 +250,7 @@ module.exports = function(RED) {
 						}
 					});
 				}
-				if (auth0TokenSecret && node.jwtInternalCheckOnly) {					
+				if (auth0TokenSecret) {					
 					jwt.verify(jwtToken, new Buffer(auth0TokenSecret, 'base64'), function(tokenError, decoded) {
 						if (!tokenError) {							
 							node.log("httpMiddleware:" + decoded.aud);
