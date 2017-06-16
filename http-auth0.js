@@ -202,7 +202,11 @@ module.exports = function(RED) {
 				
 				if (!req.cookies['id_token'] && jwtToken) {
 					node.log("httpMiddleware: SET COOKIE " + jwtToken.substring(0, 10));
-					res.cookie('id_token', jwtToken, { maxAge: node.cookieMaxAge, httpOnly: true });
+					if (jwtToken === "null") {
+						res.clearCookie('id_token');
+					} else {
+						res.cookie('id_token', jwtToken, { maxAge: node.cookieMaxAge, httpOnly: true });	
+					}
 				}
 				
 				function requestTokenInfo(req, res, next) {
