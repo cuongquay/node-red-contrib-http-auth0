@@ -209,7 +209,7 @@ module.exports = function(RED) {
 					}
 				}
 				
-				function requestTokenInfo(req, res, next) {
+				function requestTokenInfo(req, res, next, maxAge) {
 					node.log("httpMiddleware:" + tokenProviderUrl);
 					var options = {
 						uri : tokenProviderUrl,
@@ -231,9 +231,9 @@ module.exports = function(RED) {
 							}							
 							if (req.tokeninfo.authorized) {
 								if (!req.cookies['email']) {
-									res.cookie('email', req.tokeninfo.email, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
-									res.cookie('roles', req.tokeninfo.roles, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
-									res.cookie('groups', req.tokeninfo.groups, { maxAge: parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+									res.cookie('email', req.tokeninfo.email, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+									res.cookie('roles', req.tokeninfo.roles, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+									res.cookie('groups', req.tokeninfo.groups, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
 								}
 								next();
 							} else {
@@ -260,7 +260,7 @@ module.exports = function(RED) {
 							node.log("httpMiddleware:" + decoded.aud);
 							if (!req.cookies['email']) {
 								tokenProviderUrl = decoded.iss + "tokeninfo";
-								requestTokenInfo(req, res, next);
+								requestTokenInfo(req, res, next, parseInt(decoded.exp - new Date().getTime()/1000));
 							} else {
 								req.tokeninfo = {
 									user_id: decoded.sub,
