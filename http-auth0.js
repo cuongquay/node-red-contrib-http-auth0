@@ -260,7 +260,7 @@ module.exports = function(RED) {
 							node.log("httpMiddleware:" + decoded.aud);
 							if (!req.cookies['email']) {
 								tokenProviderUrl = decoded.iss + "tokeninfo";
-								requestTokenInfo(req, res, next, parseInt(decoded.exp - new Date().getTime()/1000));
+								requestTokenInfo(req, res, next, parseInt(decoded.exp*1000 - new Date().getTime()));
 							} else {
 								req.tokeninfo = {
 									user_id: decoded.sub,
