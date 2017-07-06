@@ -231,9 +231,9 @@ module.exports = function(RED) {
 							}							
 							if (req.tokeninfo.authorized) {
 								if (!req.cookies['email']) {
-									res.cookie('email', req.tokeninfo.email, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
-									res.cookie('roles', req.tokeninfo.roles, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
-									res.cookie('groups', req.tokeninfo.groups, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 900000, httpOnly: true });
+									res.cookie('email', req.tokeninfo.email, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 90000000, httpOnly: true });
+									res.cookie('roles', req.tokeninfo.roles, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 90000000, httpOnly: true });
+									res.cookie('groups', req.tokeninfo.groups, { maxAge: maxAge || parseInt(node.cookieMaxAge) || 90000000, httpOnly: true });
 								}
 								next();
 							} else {
